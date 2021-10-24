@@ -27,25 +27,53 @@ typedef struct{
 	size_t length,capacity;
 }_cvec_hdr;
 
+void* _cvec_xcalloc(size_t nmemb,size_t size){
+	void* p = calloc(nmemb,size);
+	if(!p){exit(1);}
+	return p;
+}
+
+void* _cvec_xmalloc(size_t size){
+	void* p = malloc(size);
+	if(!p){exit(1);}
+	return p;
+}
+
+void* _cvec_xrealloc(void* ptr,size_t size){
+	void* p = realloc(ptr,size);
+	if(!p){exit(1);}
+	return p;
+}
+
+#ifndef CVEC_CALLOC
+#define CVEC_CALLOC _cvec_xcalloc
+#endif
+#ifndef CVEC_MALLOC
+#define CVEC_MALLOC _cvec_xmalloc
+#endif
+#ifndef CVEC_REALLOC
+#define CVEC_REALLOC _cvec_xrealloc
+#endif
+
 #define _cvec_get_header(vec) ((_cvec_hdr *)(vec) - 1)
 
-#define cvec_new(type,name) type* name = (type*)((_cvec_hdr*)calloc(1,sizeof(_cvec_hdr))+1)
+#define cvec_new(type,name) type* name = (type*)((_cvec_hdr*)CVEC_CALLOC(1,sizeof(_cvec_hdr))+1)
 
 #define cvec_new_from_data(type,name,data,len)\
-	type* name = (type*)((_cvec_hdr*)malloc(sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
+	type* name = (type*)((_cvec_hdr*)CVEC_MALLOC(sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
 	memcpy(name,data,(len)*sizeof(type));\
 	_cvec_get_header(name)->capacity = len;\
 	_cvec_get_header(name)->length = len
 
 #define cvec_new_len(type,name,len)\
-	type* name = (type*)((_cvec_hdr*)malloc(sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
+	type* name = (type*)((_cvec_hdr*)CVEC_MALLOC(sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
 	_cvec_get_header(name)->capacity = len;\
 	_cvec_get_header(name)->length = 0
 
 #define cvec_new_filled(type,name,value,len)\
 	type* name;\
 	if(!(value)) {\
-		(name) = (type*)((_cvec_hdr*)calloc(1,sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
+		(name) = (type*)((_cvec_hdr*)CVEC_CALLOC(1,sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
 	}else{\
 		(name) = cvec_new_len(len);\
 		for(size_t i = 0;i<(len);i++){\
@@ -57,7 +85,7 @@ typedef struct{
 #define cvec_copy(name,vec) cvec_new_from_data(typeof(*(vec)),name,vec,_cvec_get_header(vec)->length)
 
 #define cvec_reserve(vecp,new_size)\
-	*(vecp) = (typeof(*(vecp)))((_cvec_hdr*)realloc(_cvec_get_header(*(vecp)), (new_size) * sizeof(**(vecp)) + sizeof(_cvec_hdr)) + 1);\
+	*(vecp) = (typeof(*(vecp)))((_cvec_hdr*)CVEC_REALLOC(_cvec_get_header(*(vecp)), (new_size) * sizeof(**(vecp)) + sizeof(_cvec_hdr)) + 1);\
 	_cvec_get_header(*(vecp))->capacity = new_size
 
 #define cvec_shrink(vecp) cvec_reserve(vecp,_cvec_get_header(*(vecp))->length)
