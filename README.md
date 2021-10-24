@@ -1,5 +1,5 @@
 # cvec
-Fast vector implementation in C
+Fast header-only vector implementation in C
 
 # Example
 
