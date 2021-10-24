@@ -20,6 +20,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define _CVEC_PHI ((long double)((1+sqrt(5))/2))
 
@@ -29,19 +30,19 @@ typedef struct{
 
 void* _cvec_xcalloc(size_t nmemb,size_t size){
 	void* p = calloc(nmemb,size);
-	if(!p){exit(1);}
+	if(!p){puts("_cvec_xcalloc: allocation failed, exiting");exit(1);}
 	return p;
 }
 
 void* _cvec_xmalloc(size_t size){
 	void* p = malloc(size);
-	if(!p){exit(1);}
+	if(!p){puts("_cvec_xmalloc: allocation failed, exiting");exit(1);}
 	return p;
 }
 
 void* _cvec_xrealloc(void* ptr,size_t size){
 	void* p = realloc(ptr,size);
-	if(!p){exit(1);}
+	if(!p){puts("_cvec_xrealloc: allocation failed, exiting");exit(1);}
 	return p;
 }
 
