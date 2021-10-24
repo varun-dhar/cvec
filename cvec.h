@@ -81,7 +81,7 @@ void* _cvec_xrealloc(void* ptr,size_t size){
 			(name)[i] = value;\
 		}\
 	}\
-	_cvec_get_header(name)->length = _cvec_get_header(name)->capacity = len;\
+	_cvec_get_header(name)->length = _cvec_get_header(name)->capacity = len
 
 #define cvec_copy(name,vec) cvec_new_from_data(typeof(*(vec)),name,vec,_cvec_get_header(vec)->length)
 
