@@ -21,11 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stddef.h>
 
 #define _CVEC_PHI ((long double)((1+sqrt(5))/2))
 
 typedef struct{
 	size_t length,capacity;
+	max_align_t _a[];
 }_cvec_hdr;
 
 void* _cvec_xcalloc(size_t nmemb,size_t size){
@@ -85,9 +87,10 @@ void* _cvec_xrealloc(void* ptr,size_t size){
 
 #define cvec_copy(name,vec) cvec_new_from_data(typeof(*(vec)),name,vec,_cvec_get_header(vec)->length)
 
-#define cvec_reserve(vecp,new_size)\
-	*(vecp) = (typeof(*(vecp)))((_cvec_hdr*)CVEC_REALLOC(_cvec_get_header(*(vecp)), (new_size) * sizeof(**(vecp)) + sizeof(_cvec_hdr)) + 1);\
-	_cvec_get_header(*(vecp))->capacity = new_size
+#define cvec_reserve(vecp,new_size)do{\
+	*(vecp) = (void*)((_cvec_hdr*)CVEC_REALLOC(_cvec_get_header(*(vecp)), (new_size) * sizeof(**(vecp)) + sizeof(_cvec_hdr)) + 1);\
+	_cvec_get_header(*(vecp))->capacity = new_size;\
+	}while(0)
 
 #define cvec_shrink(vecp) cvec_reserve(vecp,_cvec_get_header(*(vecp))->length)
 
@@ -101,38 +104,46 @@ void* _cvec_xrealloc(void* ptr,size_t size){
 		cvec_shrink(vecp);\
 	}}while(0)
 
-#define cvec_insert_element(vecp,pos,element)\
+#define cvec_insert_element(vecp,pos,element)do{\
 	_cvec_check_grow(vecp);\
 	memmove(*(vecp)+((pos)+1),*(vecp)+(pos),(_cvec_get_header(*(vecp))->length-(pos))*sizeof(**(vecp)));\
 	(*(vecp))[pos] = element;\
-	_cvec_get_header(*(vecp))->length++
+	_cvec_get_header(*(vecp))->length++;\
+	}while(0)
 
-#define cvec_insert_data(vecp,pos,data,size)\
-	_cvec_check_grow(vecp);\
+#define cvec_insert_data(vecp,pos,data,size)do{\
+	if(_cvec_get_header(*(vecp))->length+size > _cvec_get_header(*(vecp))->capacity){\
+		cvec_reserve(vecp,(size_t)(_cvec_get_header(*(vecp))->length+size) * _CVEC_PHI);\
+	}\
 	memmove(*(vecp)+(pos)+(size),*(vecp)+(pos),(_cvec_get_header(*(vecp))->length-(pos))*sizeof(**(vecp)));\
 	memcpy(*(vecp)+(pos),data,(size)*sizeof(**(vecp)));\
-	_cvec_get_header(*(vecp))->length+=size
+	_cvec_get_header(*(vecp))->length+=size;\
+	}while(0)
 
 #define cvec_insert_vec(vecp,pos,insert) cvec_insert_data(vecp, pos, insert, _cvec_get_header(insert)->length)
 
-#define cvec_push_back(vecp,element)\
+#define cvec_push_back(vecp,element)do{\
 	_cvec_check_grow(vecp);\
 	(*(vecp))[_cvec_get_header(*(vecp))->length] = element;\
-	_cvec_get_header(*(vecp))->length++
+	_cvec_get_header(*(vecp))->length++;\
+	}while(0)
 
-#define cvec_pop_back(vecp)\
+#define cvec_pop_back(vecp)do{\
 	_cvec_get_header(*(vecp))->length--;\
-	_cvec_check_shrink(vecp)
+	_cvec_check_shrink(vecp);\
+	}while(0)
 
-#define cvec_erase(vecp,pos)\
+#define cvec_erase(vecp,pos)do{\
 	memmove(*(vecp)+(pos),*(vecp)+(pos)+1,(_cvec_get_header(*(vecp))->length-(pos)-1)*sizeof(**(vecp)));\
 	_cvec_get_header(*(vecp))->length--;\
-	_cvec_check_shrink(vecp)
+	_cvec_check_shrink(vecp);\
+	}while(0)
 
-#define cvec_erase_range(vecp,start,end)\
+#define cvec_erase_range(vecp,start,end)do{\
 	memmove(*(vecp)+(start),*(vecp)+(end),(_cvec_get_header(*(vecp))->length-(end))*sizeof(**(vecp)));\
 	_cvec_get_header(*(vecp))->length-=(end)-(start);\
-	_cvec_check_shrink(vecp)
+	_cvec_check_shrink(vecp);\
+	}while(0)
 
 #define cvec_at(vec,i) (assert((i) < _cvec_get_header(vec)->length),(vec)[i])
 
