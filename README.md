@@ -8,21 +8,22 @@ Fast header-only vector implementation in C
 #include "cvec.h"
 
 int main(void){
-  cvec_new(int,vec);
-  for(int i = 0;i<20;i++){
-    cvec_push_back(&vec,i);
-  }
-  assert(cvec_len(vec) == 20);
-  for(int i = 0;i<10;i++){
-    cvec_pop_back(&vec);
-  }
-  assert(cvec_len(vec) == 10);
-  int arr[] = {10,11,12,13,14};
-  cvec_insert_data(&vec,cvec_len(vec),arr,sizeof(arr)/sizeof(*arr));
-  for(int i = 0;i<15;i++){
-    assert(vec[i] == i);
-  }
-  cvec_destroy(vec);
+	int* vec = NULL;
+	cvec_init(&vec);
+	for(int i = 0;i<20;i++){
+		cvec_push_back(&vec,i);
+	}
+	assert(cvec_len(vec) == 20);
+	for(int i = 0;i<10;i++){
+		cvec_pop_back(&vec);
+	}
+	assert(cvec_len(vec) == 10);
+	int arr[] = {10,11,12,13,14};
+	cvec_insert_data(&vec,cvec_len(vec),arr,sizeof(arr)/sizeof(*arr));
+	for(int i = 0;i<15;i++){
+		assert(vec[i] == i);
+	}
+	cvec_destroy(vec);
 }
 ```
 
@@ -31,34 +32,34 @@ int main(void){
 Functions (macros) taking `vecp` as an argument require the address of the vector. If they take `vec`, pass the vector. 
 
 ```
-cvec_new(type,name)
+cvec_init(vecp)
 ```
 
-Creates a new, empty, vector of type `type` named `name`.
+Creates a new, empty, vector. `vecp` must be a the address of a non-void pointer set to NULL.
 
 ```
-cvec_new_from_data(type,name,data,len)
+cvec_init_from_data(vecp,data,len)
 ```
 
-Creates a new vector of type `type` named `name` with data copied from `data`.
+Creates a new vector with data copied from `data`. `vecp` must be a the address of a non-void pointer set to NULL.
 
 ```
-cvec_new_len(type,name,len)
+cvec_new_len(vecp,len)
 ```
 
-Creates a new, empty, vector of type `type` named `name` of size `len`.
+Creates a new, empty, vector of size `len`. `vecp` must be a the address of a non-void pointer set to NULL.
 
 ```
-cvec_new_filled(type,name,value,len)
+cvec_new_filled(vecp,value,len)
 ```
 
-Creates a new vector of type `type` named `name` filled with `len` copies of `value`.
+Creates a new vector filled with `len` copies of `value`. `vecp` must be a the address of a non-void pointer set to NULL.
 
 ```
-cvec_copy(name,vec)
+cvec_copy(vecp,vec)
 ```
 
-Creates a copy of `vec` named `name`.
+Makes a copy of `vec`. `vecp` must be a the address of a non-void pointer set to NULL.
 
 ```
 cvec_destroy(vec)

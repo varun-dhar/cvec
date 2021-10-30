@@ -64,32 +64,37 @@ void* _cvec_xrealloc(void* ptr,size_t size){
 
 #define cvec_capacity(vec) (_cvec_get_header(vec)->capacity)
 
-#define cvec_new(type,name) type* name = (type*)((_cvec_hdr*)CVEC_CALLOC(1,sizeof(_cvec_hdr))+1)
+#define cvec_init(vecp) (assert(!*(vecp)),*(vecp) = (void*)((_cvec_hdr*)CVEC_CALLOC(1,sizeof(_cvec_hdr))+1))
 
-#define cvec_new_from_data(type,name,data,len)\
-	type* name = (type*)((_cvec_hdr*)CVEC_MALLOC(sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
-	memcpy(name,data,(len)*sizeof(type));\
-	cvec_capacity(name) = len;\
-	cvec_len(name) = len
+#define cvec_init_from_data(vecp,data,len)do{\
+	assert(!*(vecp));\
+	*(vecp) = (void*)((_cvec_hdr*)CVEC_MALLOC(sizeof(_cvec_hdr)+(len)*sizeof(**(vecp)))+1);\
+	memcpy(*(vecp),data,(len)*sizeof(**(vecp)));\
+	cvec_capacity(*(vecp)) = len;\
+	cvec_len(*(vecp)) = len;\
+	}while(0)
 
-#define cvec_new_len(type,name,len)\
-	type* name = (type*)((_cvec_hdr*)CVEC_MALLOC(sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
-	cvec_capacity(name) = len;\
-	cvec_len(name) = 0
+#define cvec_init_len(vecp,len)do{\
+	assert(!*(vecp));\
+	*(vecp) = (void*)((_cvec_hdr*)CVEC_MALLOC(sizeof(_cvec_hdr)+(len)*sizeof(**(vecp)))+1);\
+	cvec_capacity(*(vecp)) = len;\
+	cvec_len(*(vecp)) = 0;\
+	}while(0)
 
-#define cvec_new_filled(type,name,value,len)\
-	type* name;\
+#define cvec_init_filled(vecp,value,len)do{\
+	assert(!*(vecp));\
 	if(!(value)) {\
-		(name) = (type*)((_cvec_hdr*)CVEC_CALLOC(1,sizeof(_cvec_hdr)+(len)*sizeof(type))+1);\
+		*(vecp) = (void*)((_cvec_hdr*)CVEC_CALLOC(1,sizeof(_cvec_hdr)+(len)*sizeof(**(vecp)))+1);\
 	}else{\
-		(name) = cvec_new_len(len);\
+		cvec_init_len(vecp,len);\
 		for(size_t i = 0;i<(len);i++){\
-			(name)[i] = value;\
+			(*(vecp))[i] = value;\
 		}\
 	}\
-	cvec_len(name) = cvec_capacity(name) = len
+	cvec_len(*(vecp)) = cvec_capacity(*(vecp)) = len;\
+	}while(0)
 
-#define cvec_copy(name,vec) cvec_new_from_data(typeof(*(vec)),name,vec,cvec_len(vec))
+#define cvec_copy(vecp,vec) cvec_init_from_data(vecp,vec,cvec_len(vec))
 
 #define cvec_empty(vec) (cvec_len(vec) == 0)
 
