@@ -133,7 +133,7 @@ void* _cvec_xrealloc(void* ptr,size_t size){
 	cvec_len(*(vecp))+=size;\
 	}while(0)
 
-#define cvec_insert_vec(vecp,pos,insert) cvec_insert_data(vecp, pos, insert, cvec_len(*(vecp)))
+#define cvec_insert_vec(vecp,pos,insert) cvec_insert_data(vecp, pos, insert, cvec_len(insert))
 
 #define cvec_push_data_back(vecp,data,size) cvec_insert_data(vecp,cvec_len(*(vecp)),data,size)
 
