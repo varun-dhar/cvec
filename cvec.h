@@ -32,19 +32,28 @@ typedef struct{
 
 static inline void* _cvec_xcalloc(size_t nmemb,size_t size){
 	void* p = calloc(nmemb,size);
-	if(!p){puts("_cvec_xcalloc: allocation failed, exiting");exit(1);}
+	if(!p){
+		fputs("_cvec_xcalloc: allocation failed, exiting\n",stderr);
+		exit(1);
+	}
 	return p;
 }
 
 static inline void* _cvec_xmalloc(size_t size){
 	void* p = malloc(size);
-	if(!p){puts("_cvec_xmalloc: allocation failed, exiting");exit(1);}
+	if(!p){
+		fputs("_cvec_xmalloc: allocation failed, exiting\n",stderr);
+		exit(1);
+	}
 	return p;
 }
 
 static inline void* _cvec_xrealloc(void* ptr,size_t size){
 	void* p = realloc(ptr,size);
-	if(!p){puts("_cvec_xrealloc: allocation failed, exiting");exit(1);}
+	if(!p){
+		fputs("_cvec_xrealloc: allocation failed, exiting\n",stderr);
+		exit(1);
+	}
 	return p;
 }
 
