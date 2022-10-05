@@ -1,5 +1,5 @@
 /*
-   Copyright 2021 Varun Dhar
+   Copyright 2022 Varun Dhar
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -30,19 +30,19 @@ typedef struct{
 	max_align_t _a[];
 }_cvec_hdr;
 
-void* _cvec_xcalloc(size_t nmemb,size_t size){
+static inline void* _cvec_xcalloc(size_t nmemb,size_t size){
 	void* p = calloc(nmemb,size);
 	if(!p){puts("_cvec_xcalloc: allocation failed, exiting");exit(1);}
 	return p;
 }
 
-void* _cvec_xmalloc(size_t size){
+static inline void* _cvec_xmalloc(size_t size){
 	void* p = malloc(size);
 	if(!p){puts("_cvec_xmalloc: allocation failed, exiting");exit(1);}
 	return p;
 }
 
-void* _cvec_xrealloc(void* ptr,size_t size){
+static inline void* _cvec_xrealloc(void* ptr,size_t size){
 	void* p = realloc(ptr,size);
 	if(!p){puts("_cvec_xrealloc: allocation failed, exiting");exit(1);}
 	return p;
